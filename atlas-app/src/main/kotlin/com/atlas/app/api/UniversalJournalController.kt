@@ -56,9 +56,10 @@ class UniversalJournalController(
     fun getTrialBalance(
         @RequestParam companyId: UUID,
         @RequestParam(defaultValue = "0L") ledgerCode: String,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) asOfDate: LocalDate
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) asOfDate: LocalDate? = null
     ): ResponseEntity<TrialBalanceReport> {
-        val report = reportingService.getTrialBalance(companyId, ledgerCode, asOfDate)
+        val effectiveDate = asOfDate ?: LocalDate.now()
+        val report = reportingService.getTrialBalance(companyId, ledgerCode, effectiveDate)
         return ResponseEntity.ok(report)
     }
 

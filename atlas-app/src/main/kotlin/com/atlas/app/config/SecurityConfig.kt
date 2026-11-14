@@ -25,6 +25,7 @@ class SecurityConfig {
                         "/css/**",
                         "/js/**",
                         "/favicon.ico",
+                        "/error",
                         "/actuator/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",

@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlas ERP — Enterprise Portal</title>
+  <style>
+    :root {
+      --primary: #0f4c81;
+      --primary-dark: #092c4c;
+      --primary-light: #e8f1f8;
+      --accent: #008080;
+      --success: #1b8a5a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --bg: #f4f6f9;
+      --card-bg: #ffffff;
+      --text: #1f2937;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --radius: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-lg: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    /* Top Header */
+    header {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+      color: #fff;
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-lg);
+    }
+    .logo-group { display: flex; align-items: center; gap: 0.75rem; }
+    .logo-badge { background: #38bdf8; color: var(--primary-dark); font-weight: 800; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
+    .brand-title { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.5px; }
+    .brand-subtitle { font-size: 0.75rem; color: #cbd5e1; }
+    
+    .header-actions { display: flex; align-items: center; gap: 1rem; }
+    .status-pill {
+      display: flex; align-items: center; gap: 0.4rem;
+      background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981;
+      color: #a7f3d0; font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 9999px;
+    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; }
+    .nav-btn {
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+      color: #fff; text-decoration: none; font-size: 0.8rem; font-weight: 500;
+      padding: 6px 12px; border-radius: var(--radius); cursor: pointer; transition: all 0.15s;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.25); }
+
+    /* Sub-bar / Context Bar */
+    .context-bar {
+      background: #fff; border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.5rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted);
+    }
+    .context-tags { display: flex; gap: 1.25rem; }
+    .context-tags span strong { color: var(--text); }
+    
+    /* Layout */
+    .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; width: 100%; flex: 1; }
+
+    /* KPI Summary Cards */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .kpi-card {
+      background: var(--card-bg); border-radius: var(--radius); padding: 1.1rem;
+      border: 1px solid var(--border); box-shadow: var(--shadow);
+    }
+    .kpi-title { font-size: 0.75rem; text-transform: uppercase; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem; }
+    .kpi-value { font-size: 1.45rem; font-weight: 700; color: var(--primary-dark); }
+    .kpi-sub { font-size: 0.75rem; margin-top: 0.35rem; color: var(--success); font-weight: 500; }
+
+    /* Tabs */
+    .tabs-nav {
+      display: flex; gap: 0.25rem; border-bottom: 2px solid var(--border);
+      margin-bottom: 1.25rem; overflow-x: auto;
+    }
+    .tab-btn {
+      background: none; border: none; padding: 0.65rem 1.25rem;
+      font-size: 0.9rem; font-weight: 600; color: var(--text-muted);
+      cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s;
+    }
+    .tab-btn:hover { color: var(--primary); }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    /* Tab Content Panes */
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* Grid Layout inside Panes */
+    .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.25rem; }
+    @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } }
+
+    /* Cards & Tables */
+    .panel {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 1.25rem;
+    }
+    .panel-header {
+      padding: 0.85rem 1.15rem; background: #fafbfc;
+      border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
+    }
+    .panel-title { font-size: 0.95rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 0.5rem; }
+    .panel-body { padding: 1.15rem; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th {
+      background: #f8fafc; color: var(--text-muted); font-weight: 600;
+      text-align: left; padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border); text-transform: uppercase; font-size: 0.72rem;
+    }
+    td { padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border); color: var(--text); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f9fafb; }
+    .text-right { text-align: right; }
+    .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.78rem; }
+
+    /* Badges */
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+    }
+    .badge-success { background: #def7ec; color: #03543f; }
+    .badge-info { background: #e1effe; color: #1e429f; }
+    .badge-warning { background: #fef08a; color: #713f12; }
+    .badge-danger { background: #fde8e8; color: #9b1c1c; }
+
+    /* Forms */
+    .form-group { margin-bottom: 0.9rem; }
+    .form-group label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text); margin-bottom: 0.3rem; }
+    .form-control {
+      width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--border);
+      border-radius: var(--radius); font-size: 0.82rem; color: var(--text); outline: none; transition: border-color 0.15s;
+    }
+    .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(15,76,129,0.15); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+      padding: 0.55rem 1rem; border-radius: var(--radius); font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; border: 1px solid transparent; transition: all 0.15s;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: #f3f4f6; color: var(--text); border-color: var(--border); }
+    .btn-secondary:hover { background: #e5e7eb; }
+    .btn-block { width: 100%; }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem; max-width: 400px;
+      padding: 0.85rem 1.15rem; border-radius: var(--radius); background: #1f2937; color: #fff;
+      box-shadow: var(--shadow-lg); font-size: 0.85rem; display: none; z-index: 9999; animation: slideIn 0.2s ease-out;
+    }
+    #toast.success { background: #065f46; border-left: 4px solid #10b981; }
+    #toast.error { background: #991b1b; border-left: 4px solid #f87171; }
+    @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* Footer */
+    footer {
+      background: #fff; border-top: 1px solid var(--border); padding: 0.75rem 1.5rem;
+      font-size: 0.75rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="logo-group">
+      <span class="logo-badge">Enterprise</span>
+      <div>
+        <div class="brand-title">ATLAS ERP</div>
+        <div class="brand-subtitle">Cloud-Native Spec-Driven Modular Monolith</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        <span id="system-status-text">Ledger Online (Port 8080)</span>
+      </div>
+      <button class="nav-btn" onclick="refreshAllData()">↻ Refresh</button>
+      <a class="nav-btn" href="/swagger-ui/index.html" target="_blank">Swagger UI</a>
+      <a class="nav-btn" href="/v3/api-docs" target="_blank">OpenAPI JSON</a>
+    </div>
+  </header>
+
+  <!-- Context Bar -->
+  <div class="context-bar">
+    <div class="context-tags">
+      <span><strong>Tenant:</strong> <code class="font-mono">00000000-0000-0000-0000-000000000001</code></span>
+      <span><strong>Company:</strong> <code class="font-mono">US01 (Atlas Global Operations)</code></span>
+      <span><strong>Ledger:</strong> <code class="font-mono">0L (Leading Ledger)</code></span>
+    </div>
+    <div>
+      <span>Architecture: <strong>Spring Boot 3.3.5 & Spring Modulith</strong></span>
+    </div>
+  </div>
+
+  <div class="container">
+    
+    <!-- KPI Summary Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-title">Universal Journal Debits</div>
+        <div class="kpi-value" id="kpi-debits">$0.00</div>
+        <div class="kpi-sub" id="kpi-balance-status">Checking balance...</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Universal Journal Credits</div>
+        <div class="kpi-value" id="kpi-credits">$0.00</div>
+        <div class="kpi-sub">Rule FIN-INV-1 (Balanced)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Purchase Orders (PRC)</div>
+        <div class="kpi-value" id="kpi-po-count">0</div>
+        <div class="kpi-sub">Source-to-Pay Lifecycle</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Sales Orders (SLS)</div>
+        <div class="kpi-value" id="kpi-so-count">0</div>
+        <div class="kpi-sub">Order-to-Cash Lifecycle</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Inventory Items (INV)</div>
+        <div class="kpi-value" id="kpi-stock-count">0</div>
+        <div class="kpi-sub">Stock Movement Ledger</div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('finance')">📊 Financial Ledger (Universal Journal)</button>
+      <button class="tab-btn" onclick="switchTab('procurement')">🛒 Sourcing & Procurement (MM-PUR)</button>
+      <button class="tab-btn" onclick="switchTab('sales')">📦 Sales & Distribution (SD)</button>
+      <button class="tab-btn" onclick="switchTab('inventory')">🏭 Inventory & Warehouse (MM-IM)</button>
+      <button class="tab-btn" onclick="switchTab('audit')">🛡️ Tamper-Evident Audit (PLT-AUD)</button>
+    </div>
+
+    <!-- 1. Finance Tab -->
+    <div id="tab-finance" class="tab-pane active">
+      <div class="content-grid">
+        <div>
+          <!-- Trial Balance Table -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">⚖️ Real-Time Trial Balance (DAT-001)</div>
+              <span class="badge badge-success" id="tb-badge">Balanced</span>
+            </div>
+            <div class="panel-body" style="padding: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Account Code</th>
+                    <th>Account Title</th>
+                    <th>Currency</th>
+                    <th class="text-right">Total Debit</th>
+                    <th class="text-right">Total Credit</th>
+                    <th class="text-right">Net Balance</th>
+                  </tr>
+                </thead>
+                <tbody id="trial-balance-tbody">
+                  <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Loading trial balance...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Journal Entries Table -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">📜 Universal Journal Entries (Append-Only)</div>
+              <span class="badge badge-info" id="je-count-badge">0 Entries</span>
+            </div>
+            <div class="panel-body" style="padding: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Doc #</th>
+                    <th>Type</th>
+                    <th>Posting Date</th>
+                    <th>Reference</th>
+                    <th>SHA-256 Content Hash</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="journal-entries-tbody">
+                  <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Loading entries...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- Post Manual Journal Entry Form -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">✍️ Post Balanced Journal Entry</div>
+            </div>
+            <div class="panel-body">
+              <form id="post-je-form" onsubmit="submitJournalEntry(event)">
+                <div class="form-group">
+                  <label>Reference Code</label>
+                  <input type="text" class="form-control" id="je-ref" value="WEB-JE-101" required>
+                </div>
+                <div class="form-group">
+                  <label>Header Description</label>
+                  <input type="text" class="form-control" id="je-text" value="Operational Cash Transfer" required>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Debit Account</label>
+                    <input type="text" class="form-control" id="je-debit-acc" value="100000" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Credit Account</label>
+                    <input type="text" class="form-control" id="je-credit-acc" value="400000" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" step="0.01" class="form-control" id="je-amount" value="750.00" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Currency</label>
+                    <input type="text" class="form-control" id="je-curr" value="USD" readonly>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Post To Universal Journal</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Reversal Form -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">↩️ Reverse Journal Entry (FIN-GL-007)</div>
+            </div>
+            <div class="panel-body">
+              <form id="reverse-je-form" onsubmit="submitReversal(event)">
+                <div class="form-group">
+                  <label>Entry Document ID (UUID)</label>
+                  <input type="text" class="form-control font-mono" id="rev-doc-id" placeholder="Select from entries list" required>
+                </div>
+                <div class="form-group">
+                  <label>Reason for Reversal</label>
+                  <input type="text" class="form-control" id="rev-reason" value="Correction of incorrect line assignment" required>
+                </div>
+                <button type="submit" class="btn btn-secondary btn-block">Post Immutable Reversal</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Procurement Tab -->
+    <div id="tab-procurement" class="tab-pane">
+      <div class="content-grid">
+        <div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">📋 Purchase Orders (Source-to-Pay)</div>
+            </div>
+            <div class="panel-body" style="padding: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>PO Number</th>
+                    <th>Supplier ID</th>
+                    <th>Order Date</th>
+                    <th>Status</th>
+                    <th>Line Items</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="po-tbody">
+                  <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Loading purchase orders...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- Create PO Form -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">🛒 Create Purchase Order</div>
+            </div>
+            <div class="panel-body">
+              <form onsubmit="submitCreatePo(event)">
+                <div class="form-group">
+                  <label>Material Code</label>
+                  <input type="text" class="form-control" id="po-mat" value="STEEL-BEAM-01" required>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" class="form-control" id="po-qty" value="50" required>
+                  </div>
+                  <div class="form-group">
+                    <label>UOM</label>
+                    <input type="text" class="form-control" id="po-uom" value="EA" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Unit Price ($)</label>
+                    <input type="number" step="0.01" class="form-control" id="po-price" value="50.00" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Currency</label>
+                    <input type="text" class="form-control" id="po-curr" value="USD" readonly>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Create & Approve PO</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Goods Receipt & 3-Way Match Quick Action -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">📦 Operational Steps (GR & AP Match)</div>
+            </div>
+            <div class="panel-body">
+              <div class="form-group">
+                <label>Target PO ID (UUID)</label>
+                <input type="text" class="form-control font-mono" id="target-po-id" placeholder="Copy from PO table">
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="postGrForTarget()">Post Goods Receipt</button>
+                <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="matchInvoiceForTarget()">3-Way Invoice Match</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Sales Tab -->
+    <div id="tab-sales" class="tab-pane">
+      <div class="content-grid">
+        <div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">📦 Sales Orders (Order-to-Cash)</div>
+            </div>
+            <div class="panel-body" style="padding: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Order Number</th>
+                    <th>Customer ID</th>
+                    <th>Order Date</th>
+                    <th>Status</th>
+                    <th>Items</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="so-tbody">
+                  <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Loading sales orders...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- Create SO Form -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">📝 Create Sales Order</div>
+            </div>
+            <div class="panel-body">
+              <form onsubmit="submitCreateSo(event)">
+                <div class="form-group">
+                  <label>Material Code</label>
+                  <input type="text" class="form-control" id="so-mat" value="STEEL-BEAM-01" required>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" class="form-control" id="so-qty" value="15" required>
+                  </div>
+                  <div class="form-group">
+                    <label>UOM</label>
+                    <input type="text" class="form-control" id="so-uom" value="EA" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Selling Price ($)</label>
+                    <input type="number" step="0.01" class="form-control" id="so-price" value="85.00" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Currency</label>
+                    <input type="text" class="form-control" id="so-curr" value="USD" readonly>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Confirm Sales Order</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Delivery & Billing Quick Actions -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">🚚 Fulfill & Bill (SD Steps)</div>
+            </div>
+            <div class="panel-body">
+              <div class="form-group">
+                <label>Target SO ID (UUID)</label>
+                <input type="text" class="form-control font-mono" id="target-so-id" placeholder="Copy from Sales Order table">
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="postDeliveryForTarget()">Post Delivery (GI)</button>
+                <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="postBillingForTarget()">Post Billing</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Inventory Tab -->
+    <div id="tab-inventory" class="tab-pane">
+      <div class="content-grid">
+        <div>
+          <!-- Stock Balances Table -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">📦 Current Stock Balances (On-Hand)</div>
+            </div>
+            <div class="panel-body" style="padding: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Material Code</th>
+                    <th>Plant ID</th>
+                    <th>Storage Loc</th>
+                    <th class="text-right">Quantity On-Hand</th>
+                    <th>UOM</th>
+                  </tr>
+                </thead>
+                <tbody id="inventory-tbody">
+                  <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Loading inventory...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Stock Movements Table -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">🔄 Material Movement Ledger</div>
+            </div>
+            <div class="panel-body" style="padding: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Type</th>
+                    <th>Material</th>
+                    <th class="text-right">Quantity</th>
+                    <th>UOM</th>
+                    <th class="text-right">Valuation ($)</th>
+                    <th>Reference</th>
+                  </tr>
+                </thead>
+                <tbody id="movements-tbody">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Loading movements...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- Post Stock Movement Form -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">⚡ Post Stock Movement</div>
+            </div>
+            <div class="panel-body">
+              <form onsubmit="submitStockMovement(event)">
+                <div class="form-group">
+                  <label>Movement Type</label>
+                  <select class="form-control" id="inv-mov-type">
+                    <option value="561">561 — Initial Stock Upload (Valued)</option>
+                    <option value="201">201 — Consumption to Cost Center</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Material Code</label>
+                  <input type="text" class="form-control" id="inv-mat" value="RAW-STEEL-01" required>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" class="form-control" id="inv-qty" value="100" required>
+                  </div>
+                  <div class="form-group">
+                    <label>UOM</label>
+                    <input type="text" class="form-control" id="inv-uom" value="KG" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Valuation Amount ($)</label>
+                    <input type="number" step="0.01" class="form-control" id="inv-val" value="500.00">
+                  </div>
+                  <div class="form-group">
+                    <label>Reference</label>
+                    <input type="text" class="form-control" id="inv-ref" value="PHYSICAL-COUNT-01">
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Post Stock Movement</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Audit Tab -->
+    <div id="tab-audit" class="tab-pane">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🛡️ Tamper-Evident SHA-256 Audit Trail (PLT-AUD)</div>
+        </div>
+        <div class="panel-body">
+          <div style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem;">
+            <input type="text" id="audit-entity-id" class="form-control font-mono" placeholder="Enter Entity UUID (e.g. Journal Entry or PO ID)">
+            <button class="btn btn-primary" onclick="lookupAudit()">Inspect Cryptographic Trail</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Entity Type</th>
+                <th>Action</th>
+                <th>Actor Type</th>
+                <th>Payload State</th>
+                <th>Entry Hash (SHA-256)</th>
+              </tr>
+            </thead>
+            <tbody id="audit-tbody">
+              <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Enter an Entity UUID above or click inspect on any transaction to verify hash chaining.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Toast Notification Box -->
+  <div id="toast">Notification</div>
+
+  <!-- Footer -->
+  <footer>
+    <div>Atlas ERP Platform v0.1.0-SNAPSHOT | Core Universal Journal Spec DAT-001 | Compliant with SAP S/4HANA Rules</div>
+    <div>Running on OpenJDK 21 LTS | In-Memory Dev Profile</div>
+  </footer>
+
+  <!-- Application Logic -->
+  <script>
+    const TENANT_ID = "00000000-0000-0000-0000-000000000001";
+    const COMPANY_ID = "00000000-0000-0000-0000-000000000002";
+    const SUPPLIER_ID = "00000000-0000-0000-0000-000000000005";
+    const CUSTOMER_ID = "00000000-0000-0000-0000-000000000007";
+    const PLANT_ID = "00000000-0000-0000-0000-000000000003";
+    const STORAGE_LOC_ID = "00000000-0000-0000-0000-000000000004";
+
+    const ACCOUNT_TITLES = {
+      "100000": "Bank Cash & Clearing",
+      "112000": "Trade Accounts Receivable (Customer)",
+      "130000": "Inventory — Raw Materials",
+      "211000": "Trade Accounts Payable (Supplier)",
+      "212000": "GR/IR Interim Clearing Account",
+      "400000": "General Operational Revenue",
+      "410000": "Product Sales Revenue",
+      "510000": "Cost of Goods Sold (COGS)",
+      "520000": "Inventory Adjustment / Upload Gain"
+    };
+
+    function showToast(msg, type = "success") {
+      const toast = document.getElementById("toast");
+      toast.innerText = msg;
+      toast.className = type;
+      toast.style.display = "block";
+      setTimeout(() => { toast.style.display = "none"; }, 4000);
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById("tab-" + tabId).classList.add("active");
+      event.target.classList.add("active");
+    }
+
+    async function fetchJson(url, options = {}) {
+      try {
+        const res = await fetch(url, options);
+        if (!res.ok) {
+          const err = await res.text();
+          throw new Error(err || res.statusText);
+        }
+        return await res.json();
+      } catch (e) {
+        console.error("API error for " + url, e);
+        throw e;
+      }
+    }
+
+    // Refresh All ERP Data
+    async function refreshAllData() {
+      await Promise.all([
+        loadTrialBalance(),
+        loadJournalEntries(),
+        loadPurchaseOrders(),
+        loadSalesOrders(),
+        loadInventory()
+      ]);
+    }
+
+    // Load Trial Balance
+    async function loadTrialBalance() {
+      const today = new Date().toISOString().split("T")[0];
+      const tbody = document.getElementById("trial-balance-tbody");
+      try {
+        const data = await fetchJson(`/api/v1/finance/journal/trial-balance?companyId=${COMPANY_ID}&asOfDate=${today}`);
+        document.getElementById("kpi-debits").innerText = "$" + (data.totalDebits || 0).toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById("kpi-credits").innerText = "$" + (data.totalCredits || 0).toLocaleString(undefined, {minimumFractionDigits: 2});
+        
+        const badge = document.getElementById("tb-badge");
+        const kpiStatus = document.getElementById("kpi-balance-status");
+        if (data.balanced) {
+          badge.className = "badge badge-success";
+          badge.innerText = "BALANCED (FIN-INV-1)";
+          kpiStatus.innerText = "● Invariant FIN-INV-1 Satisfied";
+          kpiStatus.style.color = "var(--success)";
+        } else {
+          badge.className = "badge badge-danger";
+          badge.innerText = "UNBALANCED";
+          kpiStatus.innerText = "⚠️ Balance Mismatch";
+          kpiStatus.style.color = "var(--danger)";
+        }
+
+        if (!data.lines || data.lines.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No line items posted yet.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = data.lines.map(line => {
+          const title = ACCOUNT_TITLES[line.accountCode] || "General Ledger Account";
+          const balanceColor = line.balance > 0 ? "color: var(--primary);" : (line.balance < 0 ? "color: #b91c1c;" : "");
+          return `
+            <tr>
+              <td><code class="font-mono font-bold">${line.accountCode}</code></td>
+              <td>${title}</td>
+              <td><span class="badge badge-info">${line.currency}</span></td>
+              <td class="text-right font-mono">$${Number(line.totalDebit).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+              <td class="text-right font-mono">$${Number(line.totalCredit).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+              <td class="text-right font-mono font-bold" style="${balanceColor}">$${Number(line.balance).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+            </tr>
+          `;
+        }).join("");
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center; padding: 1rem;">Failed to load trial balance: ${err.message}</td></tr>`;
+      }
+    }
+
+    // Load Journal Entries
+    async function loadJournalEntries() {
+      const tbody = document.getElementById("journal-entries-tbody");
+      try {
+        const entries = await fetchJson("/api/v1/finance/journal/entries");
+        document.getElementById("je-count-badge").innerText = `${entries.length} Entries`;
+        if (entries.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No journal entries yet.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = entries.map(e => `
+          <tr>
+            <td><code class="font-mono font-bold">${e.documentNumber}</code></td>
+            <td><span class="badge badge-info">${e.documentType}</span></td>
+            <td>${e.postingDate}</td>
+            <td>${e.reference}</td>
+            <td class="font-mono" title="${e.contentHash}" style="max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              <a href="#" onclick="inspectAuditFor('${e.id}'); return false;">${e.contentHash.substring(0, 16)}...</a>
+            </td>
+            <td>${e.isReversed ? '<span class="badge badge-danger">REVERSED</span>' : '<span class="badge badge-success">POSTED</span>'}</td>
+          </tr>
+        `).join("");
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center; padding: 1rem;">Failed to load entries: ${err.message}</td></tr>`;
+      }
+    }
+
+    // Load Purchase Orders
+    async function loadPurchaseOrders() {
+      const tbody = document.getElementById("po-tbody");
+      try {
+        const orders = await fetchJson("/api/v1/procurement/orders");
+        document.getElementById("kpi-po-count").innerText = orders.length;
+        if (orders.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No purchase orders created yet.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = orders.map(po => `
+          <tr>
+            <td><code class="font-mono font-bold">${po.poNumber}</code></td>
+            <td><code class="font-mono">${po.supplierId.substring(0, 8)}...</code></td>
+            <td>${po.orderDate}</td>
+            <td><span class="badge badge-success">${po.status}</span></td>
+            <td>${(po.items || []).map(i => `${i.materialCode} (${i.orderedQuantity} ${i.uom} @ $${i.unitPrice})`).join(", ")}</td>
+            <td>
+              <button class="btn btn-secondary" style="padding: 2px 6px; font-size: 0.72rem;" onclick="setTargetPo('${po.id}')">Select</button>
+            </td>
+          </tr>
+        `).join("");
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center; padding: 1rem;">Failed to load POs: ${err.message}</td></tr>`;
+      }
+    }
+
+    // Load Sales Orders
+    async function loadSalesOrders() {
+      const tbody = document.getElementById("so-tbody");
+      try {
+        const orders = await fetchJson("/api/v1/sales/orders");
+        document.getElementById("kpi-so-count").innerText = orders.length;
+        if (orders.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No sales orders created yet.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = orders.map(so => `
+          <tr>
+            <td><code class="font-mono font-bold">${so.orderNumber}</code></td>
+            <td><code class="font-mono">${so.customerId.substring(0, 8)}...</code></td>
+            <td>${so.orderDate}</td>
+            <td><span class="badge badge-info">${so.status}</span></td>
+            <td>${(so.items || []).map(i => `${i.materialCode} (${i.orderedQuantity} ${i.uom} @ $${i.unitPrice})`).join(", ")}</td>
+            <td>
+              <button class="btn btn-secondary" style="padding: 2px 6px; font-size: 0.72rem;" onclick="setTargetSo('${so.id}')">Select</button>
+            </td>
+          </tr>
+        `).join("");
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center; padding: 1rem;">Failed to load SOs: ${err.message}</td></tr>`;
+      }
+    }
+
+    // Load Inventory
+    async function loadInventory() {
+      const balTbody = document.getElementById("inventory-tbody");
+      const movTbody = document.getElementById("movements-tbody");
+      try {
+        const balances = await fetchJson("/api/v1/inventory/balances");
+        document.getElementById("kpi-stock-count").innerText = balances.length;
+        if (balances.length === 0) {
+          balTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No inventory balances recorded yet.</td></tr>`;
+        } else {
+          balTbody.innerHTML = balances.map(b => `
+            <tr>
+              <td><code class="font-mono font-bold">${b.materialCode}</code></td>
+              <td><code class="font-mono">${b.plantId.substring(0, 8)}...</code></td>
+              <td><code class="font-mono">${b.storageLocationId.substring(0, 8)}...</code></td>
+              <td class="text-right font-mono font-bold">${Number(b.quantityOnHand).toLocaleString()}</td>
+              <td><span class="badge badge-info">${b.uom}</span></td>
+            </tr>
+          `).join("");
+        }
+
+        const movements = await fetchJson("/api/v1/inventory/movements");
+        if (movements.length === 0) {
+          movTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No movements recorded yet.</td></tr>`;
+        } else {
+          movTbody.innerHTML = movements.map(m => `
+            <tr>
+              <td>${new Date(m.timestamp).toLocaleTimeString()}</td>
+              <td><span class="badge badge-info">${m.movementType}</span></td>
+              <td><code class="font-mono font-bold">${m.materialCode}</code></td>
+              <td class="text-right font-mono">${Number(m.quantity).toLocaleString()}</td>
+              <td>${m.uom}</td>
+              <td class="text-right font-mono">$${m.valuationAmount ? Number(m.valuationAmount).toLocaleString(undefined, {minimumFractionDigits: 2}) : "0.00"}</td>
+              <td>${m.reference || "-"}</td>
+            </tr>
+          `).join("");
+        }
+      } catch (err) {
+        balTbody.innerHTML = `<tr><td colspan="5" style="color: red; text-align: center;">Failed to load inventory: ${err.message}</td></tr>`;
+      }
+    }
+
+    // Submit Journal Entry
+    async function submitJournalEntry(e) {
+      e.preventDefault();
+      const today = new Date().toISOString().split("T")[0];
+      const amount = parseFloat(document.getElementById("je-amount").value);
+      const payload = {
+        tenantId: TENANT_ID,
+        companyId: COMPANY_ID,
+        ledgerCode: "0L",
+        documentType: "GL_MANUAL",
+        postingDate: today,
+        documentDate: today,
+        reference: document.getElementById("je-ref").value,
+        headerText: document.getElementById("je-text").value,
+        sourceModule: "FIN_GL",
+        sourceDocumentId: "00000000-0000-0000-0000-000000000003",
+        lines: [
+          { lineNumber: 1, accountCode: document.getElementById("je-debit-acc").value, side: "DEBIT", amount: { amount: amount, currency: "USD" }, lineText: "Debit Leg" },
+          { lineNumber: 2, accountCode: document.getElementById("je-credit-acc").value, side: "CREDIT", amount: { amount: amount, currency: "USD" }, lineText: "Credit Leg" }
+        ]
+      };
+
+      try {
+        const res = await fetchJson("/api/v1/finance/journal/post", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        showToast(`Posted Journal Entry ${res.documentNumber}! SHA-256 sealed.`);
+        refreshAllData();
+      } catch (err) {
+        showToast("Posting failed: " + err.message, "error");
+      }
+    }
+
+    // Submit Reversal
+    async function submitReversal(e) {
+      e.preventDefault();
+      const today = new Date().toISOString().split("T")[0];
+      const payload = {
+        tenantId: TENANT_ID,
+        documentId: document.getElementById("rev-doc-id").value.trim(),
+        reason: document.getElementById("rev-reason").value,
+        reversalDate: today
+      };
+
+      try {
+        const res = await fetchJson("/api/v1/finance/journal/reverse", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        showToast(`Entry reversed! Inverse document ${res.documentNumber} created.`);
+        refreshAllData();
+      } catch (err) {
+        showToast("Reversal failed: " + err.message, "error");
+      }
+    }
+
+    // Create PO
+    async function submitCreatePo(e) {
+      e.preventDefault();
+      const payload = {
+        tenantId: TENANT_ID,
+        companyId: COMPANY_ID,
+        supplierId: SUPPLIER_ID,
+        items: [{
+          materialCode: document.getElementById("po-mat").value,
+          quantity: parseFloat(document.getElementById("po-qty").value),
+          uom: document.getElementById("po-uom").value,
+          unitPrice: parseFloat(document.getElementById("po-price").value),
+          currency: "USD"
+        }]
+      };
+
+      try {
+        const res = await fetchJson("/api/v1/procurement/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        showToast(`Created Purchase Order ${res.poNumber}!`);
+        setTargetPo(res.id);
+        refreshAllData();
+      } catch (err) {
+        showToast("Failed to create PO: " + err.message, "error");
+      }
+    }
+
+    function setTargetPo(id) {
+      document.getElementById("target-po-id").value = id;
+      showToast("Selected PO " + id.substring(0, 8) + " for fulfillment.");
+    }
+
+    async function postGrForTarget() {
+      const id = document.getElementById("target-po-id").value.trim();
+      if (!id) return showToast("Select or enter a PO ID first", "error");
+      try {
+        const res = await fetchJson(`/api/v1/procurement/orders/${id}/receipt`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lineNumber: 1, receivedQuantity: 50 })
+        });
+        showToast("Goods Receipt posted! Inventory debited and GR/IR interim credited.");
+        refreshAllData();
+      } catch (err) {
+        showToast("GR failed: " + err.message, "error");
+      }
+    }
+
+    async function matchInvoiceForTarget() {
+      const id = document.getElementById("target-po-id").value.trim();
+      if (!id) return showToast("Select or enter a PO ID first", "error");
+      try {
+        const res = await fetchJson(`/api/v1/procurement/orders/${id}/invoice`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ supplierInvoiceNumber: "INV-" + Date.now(), amount: 2500.00, currency: "USD" })
+        });
+        showToast("3-Way Match complete! GR/IR cleared and Accounts Payable credited.");
+        refreshAllData();
+      } catch (err) {
+        showToast("Invoice Match failed: " + err.message, "error");
+      }
+    }
+
+    // Create SO
+    async function submitCreateSo(e) {
+      e.preventDefault();
+      const payload = {
+        tenantId: TENANT_ID,
+        companyId: COMPANY_ID,
+        customerId: CUSTOMER_ID,
+        items: [{
+          materialCode: document.getElementById("so-mat").value,
+          quantity: parseFloat(document.getElementById("so-qty").value),
+          uom: document.getElementById("so-uom").value,
+          unitPrice: parseFloat(document.getElementById("so-price").value),
+          currency: "USD"
+        }]
+      };
+
+      try {
+        const res = await fetchJson("/api/v1/sales/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        showToast(`Created Sales Order ${res.orderNumber}!`);
+        setTargetSo(res.id);
+        refreshAllData();
+      } catch (err) {
+        showToast("Failed to create SO: " + err.message, "error");
+      }
+    }
+
+    function setTargetSo(id) {
+      document.getElementById("target-so-id").value = id;
+      showToast("Selected Sales Order " + id.substring(0, 8) + " for fulfillment.");
+    }
+
+    async function postDeliveryForTarget() {
+      const id = document.getElementById("target-so-id").value.trim();
+      if (!id) return showToast("Select or enter a SO ID first", "error");
+      try {
+        const res = await fetchJson(`/api/v1/sales/orders/${id}/delivery`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lineNumber: 1, issuedQuantity: 10, valuationCostPerUnit: 50.00, currency: "USD" })
+        });
+        showToast("Delivery & Goods Issue posted! COGS debited and stock deducted.");
+        refreshAllData();
+      } catch (err) {
+        showToast("Delivery failed: " + err.message, "error");
+      }
+    }
+
+    async function postBillingForTarget() {
+      const id = document.getElementById("target-so-id").value.trim();
+      if (!id) return showToast("Select or enter a SO ID first", "error");
+      try {
+        const res = await fetchJson(`/api/v1/sales/orders/${id}/billing`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lineNumber: 1, billedQuantity: 10 })
+        });
+        showToast("Billing Document posted! Customer AR debited and revenue recognized.");
+        refreshAllData();
+      } catch (err) {
+        showToast("Billing failed: " + err.message, "error");
+      }
+    }
+
+    // Submit Stock Movement
+    async function submitStockMovement(e) {
+      e.preventDefault();
+      const payload = {
+        tenantId: TENANT_ID,
+        companyId: COMPANY_ID,
+        plantId: PLANT_ID,
+        storageLocationId: STORAGE_LOC_ID,
+        movementType: document.getElementById("inv-mov-type").value,
+        materialCode: document.getElementById("inv-mat").value,
+        quantity: parseFloat(document.getElementById("inv-qty").value),
+        uom: document.getElementById("inv-uom").value,
+        valuationAmount: parseFloat(document.getElementById("inv-val").value),
+        currency: "USD",
+        reference: document.getElementById("inv-ref").value
+      };
+
+      try {
+        const res = await fetchJson("/api/v1/inventory/movements", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        showToast("Stock movement posted! Ledger and on-hand balances updated.");
+        refreshAllData();
+      } catch (err) {
+        showToast("Movement failed: " + err.message, "error");
+      }
+    }
+
+    // Audit Inspection
+    function inspectAuditFor(id) {
+      document.getElementById("audit-entity-id").value = id;
+      switchTab("audit");
+      lookupAudit();
+    }
+
+    async function lookupAudit() {
+      const id = document.getElementById("audit-entity-id").value.trim();
+      const tbody = document.getElementById("audit-tbody");
+      if (!id) return showToast("Enter an entity UUID to inspect", "error");
+      try {
+        const events = await fetchJson(`/api/v1/audit/events/${id}`);
+        if (!events || events.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No audit events recorded for this entity.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = events.map(ev => `
+          <tr>
+            <td>${new Date(ev.timestamp).toLocaleString()}</td>
+            <td><span class="badge badge-info">${ev.entityType}</span></td>
+            <td><span class="badge badge-success">${ev.action}</span></td>
+            <td>${ev.actorType} (${ev.actorName})</td>
+            <td style="max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${ev.payloadAfter || "-"}</td>
+            <td><code class="font-mono font-bold" style="color: var(--primary);">${ev.entryHash.substring(0, 20)}...</code></td>
+          </tr>
+        `).join("");
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Failed to load audit trail: ${err.message}</td></tr>`;
+      }
+    }
+
+    // Initial Load on Page Mount
+    window.addEventListener("DOMContentLoaded", () => {
+      refreshAllData();
+    });
+  </script>
+</body>
+</html>

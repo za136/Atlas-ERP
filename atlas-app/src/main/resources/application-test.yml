@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:atlas_test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;INIT=CREATE SCHEMA IF NOT EXISTS plt_org\;CREATE SCHEMA IF NOT EXISTS plt_iam\;CREATE SCHEMA IF NOT EXISTS plt_doc\;CREATE SCHEMA IF NOT EXISTS plt_aud\;CREATE SCHEMA IF NOT EXISTS plt_cfg\;CREATE SCHEMA IF NOT EXISTS fin\;CREATE SCHEMA IF NOT EXISTS prc\;CREATE SCHEMA IF NOT EXISTS sls\;CREATE SCHEMA IF NOT EXISTS inv
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+
+  flyway:
+    enabled: false
+
+  jooq:
+    sql-dialect: H2

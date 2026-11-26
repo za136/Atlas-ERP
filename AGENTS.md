@@ -1,3 +1,30 @@
+<!-- Identical in AGENTS.md, CLAUDE.md and GEMINI.md. Edit AGENTS.md, then: cp AGENTS.md CLAUDE.md && cp AGENTS.md GEMINI.md -->
+# Read this first (ZAIN LABS registry header)
+
+1. This file. 2. `HANDOFF.md` (status, next actions). 3. `Atlas ERP — Product Requirements and Specification.md`.
+
+**Status note (2026-11-26, owner decision):** Atlas is **paused at PRD stage**. Pilots use **ERPNext** as the ERP
+core; Atlas becomes the home for DACH-specific modules on top of ERPNext when a customer asks for one. Do not
+start large new Atlas modules without the owner's go.
+
+## Owner context
+- Solo developer (Zain). Target market: DACH (Germany, Austria, Switzerland). Code, comments and docs in English.
+- Budget for tools is EUR 0: prefer free and open-source; flag any paid service before adding it.
+- Main dev machine: Lenovo i5-7300U / 16 GB on Linux. No Mac.
+- This repo is project P02 in the ZAIN LABS registry `za136/factory-hq` (`projects.toml`, `HANDOFF.md`,
+  `docs/projects/P02-atlas-erp.md`). Ecosystem guide with diagrams: `za136/factory-hq` → `docs/guide/README.md`.
+
+## Working rules (all repos)
+- Small, reviewable steps. End each step with: decisions, assumptions, risks, artifacts, next step.
+- Tests with every change; tests stay offline (no real API calls).
+- Ask the owner before anything that sends messages, spends money, deletes data or publishes publicly.
+- Never commit secrets; document variables in `.env.example`.
+- **Before you stop:** update `HANDOFF.md` (Current status, Next actions, Session log) and, if the status changed,
+  the P02 stub in `za136/factory-hq`.
+- Git: `main` stays demo-able; feature branches `feat/*`, `fix/*`; conventional commits.
+
+---
+
 # Atlas ERP — Agent Constitution & Implementation Guidelines
 
 *Project Instructions for AI Agents in Google Antigravity. Version 1.0 (November 2026).*
